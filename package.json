@@ -1,0 +1,12 @@
+{
+  "name": "discord-expulsados-counter",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node api/count.js",
+    "build": "echo 'No build needed'"
+  },
+  "dependencies": {
+    "discord.js": "^14.14.1"
+  }
+}

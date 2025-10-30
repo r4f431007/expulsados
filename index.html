@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estudiantes a Expulsar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .container {
+            text-align: center;
+            padding: 3rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 600px;
+            width: 90%;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .counter {
+            font-size: 8rem;
+            font-weight: 900;
+            margin: 2rem 0;
+            text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.4);
+            line-height: 1;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .label {
+            font-size: 1.5rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+        }
+
+        .loading {
+            font-size: 1.2rem;
+            opacity: 0.7;
+        }
+
+        .error {
+            color: #ff6b6b;
+            font-size: 1.2rem;
+            padding: 1rem;
+            background: rgba(255, 107, 107, 0.2);
+            border-radius: 10px;
+            margin-top: 1rem;
+        }
+
+        .last-update {
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .refresh-btn {
+            margin-top: 2rem;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .refresh-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .refresh-btn:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Estudiantes a Expulsar</h1>
+        <div id="content">
+            <div class="loading">Cargando...</div>
+        </div>
+        <button class="refresh-btn" onclick="loadCount()">Actualizar</button>
+        <div class="last-update" id="lastUpdate"></div>
+    </div>
+
+    <script>
+        async function loadCount() {
+            const content = document.getElementById('content');
+            const lastUpdateEl = document.getElementById('lastUpdate');
+            
+            try {
+                content.innerHTML = '<div class="loading">Cargando...</div>';
+                
+                const response = await fetch('/api/count');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    content.innerHTML = `
+                        <div class="counter">${data.expulsados}</div>
+                        <div class="label">Estudiantes</div>
+                    `;
+                    
+                    const updateTime = new Date(data.timestamp).toLocaleString('es-ES');
+                    lastUpdateEl.textContent = `Última actualización: ${updateTime}`;
+                } else {
+                    content.innerHTML = `<div class="error">Error: ${data.error}</div>`;
+                }
+            } catch (error) {
+                content.innerHTML = `<div class="error">Error de conexión</div>`;
+                console.error('Error:', error);
+            }
+        }
+
+        loadCount();
+        setInterval(loadCount, 60000);
+    </script>
+</body>
+</html>

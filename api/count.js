@@ -23,8 +23,14 @@ async function getExpulsadosCount() {
 
   const roleTotalMembers = guild.roles.cache.get(process.env.ROLE_TOTAL_ID)?.members.size || 0;
   const roleActivosMembers = guild.roles.cache.get(process.env.ROLE_ACTIVOS_ID)?.members.size || 0;
+  const roleOficialesMembers = guild.roles.cache.get('1430993841670066381')?.members.size || 0;
 
-  cachedCount = roleTotalMembers - roleActivosMembers;
+  cachedCount = {
+    expulsados: roleTotalMembers - roleActivosMembers,
+    total: roleTotalMembers,
+    oficiales: roleOficialesMembers,
+    timestamp: Date.now()
+  };
   lastUpdate = Date.now();
 
   return cachedCount;
@@ -39,10 +45,12 @@ export default async function handler(req, res) {
   }
 
   try {
-    const count = await getExpulsadosCount();
+    const data = await getExpulsadosCount();
     
     res.status(200).json({
-      expulsados: count,
+      expulsados: data.expulsados,
+      total: data.total,
+      oficiales: data.oficiales,
       timestamp: new Date().toISOString()
     });
   } catch (error) {

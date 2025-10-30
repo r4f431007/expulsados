@@ -610,10 +610,10 @@
     <script>
         let previousCount = null;
         let totalStudents = 0;
-        let activeStudents = 0;
+        let oficialesStudents = 0;
         let countdownInterval = null;
 
-        const targetDate = new Date('2024-12-01T23:59:59-05:00');
+        const targetDate = new Date('2024-12-31T23:59:59-05:00');
 
         function createParticles() {
             const particlesContainer = document.getElementById('particles');
@@ -654,7 +654,7 @@
 
             const countdownHTML = `
                 <div class="countdown-title">
-                     LIMPIEZA EN 
+                     ESTUDIANTES ELIMINADOS EN
                 </div>
                 <div class="countdown-grid">
                     <div class="countdown-item">
@@ -675,7 +675,7 @@
                     </div>
                 </div>
                 <div class="countdown-warning">
-                    1 de Diciembre, 2024 - 11:59 PM (EST)
+                    31 de Diciembre, 2024 - 11:59 PM (EST)
                 </div>
             `;
 
@@ -692,7 +692,7 @@
                 if (response.ok) {
                     const count = data.expulsados;
                     totalStudents = data.total || count + 100;
-                    activeStudents = data.activos || 100;
+                    oficialesStudents = data.oficiales || 0;
                     
                     const percentage = Math.round((count / totalStudents) * 100);
                     
@@ -702,9 +702,9 @@
                                 <div class="stat-label">Total Estudiantes</div>
                                 <div class="stat-value">${totalStudents}</div>
                             </div>
-                            <div class="stat-card tooltip" data-tooltip="Estudiantes activos actualmente">
-                                <div class="stat-label">Activos</div>
-                                <div class="stat-value">${activeStudents}</div>
+                            <div class="stat-card tooltip" data-tooltip="Estudiantes oficiales">
+                                <div class="stat-label">Estudiantes Oficiales</div>
+                                <div class="stat-value">${oficialesStudents}</div>
                             </div>
                         </div>
 
@@ -724,9 +724,6 @@
                         <div class="actions">
                             <button class="btn btn-primary" onclick="loadCount()">
                                 <span>Actualizar</span>
-                            </button>
-                            <button class="btn btn-secondary" onclick="window.location.reload()">
-                                <span>↻ Recargar Todo</span>
                             </button>
                         </div>
 
@@ -791,7 +788,7 @@
 
         createParticles();
         loadCount();
-        setInterval(loadCount, 60000);
+        setInterval(loadCount, 5000);
     </script>
 </body>
 </html>

@@ -674,9 +674,9 @@
                 const data = await response.json();
                 
                 if (response.ok) {
-                    const count = data.expulsados;
                     totalStudents = data.total || 0;
                     oficialesStudents = data.oficiales || 0;
+                    const count = totalStudents - oficialesStudents;
                     
                     const percentage = totalStudents > 0 ? Math.round((count / totalStudents) * 100) : 0;
                     

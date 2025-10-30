@@ -20,6 +20,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style>
         :root {
@@ -571,6 +572,108 @@
             font-style: italic;
         }
 
+        .divider {
+            width: 100%;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 2rem 0;
+        }
+
+        .check-section {
+            padding: 2rem 0;
+        }
+
+        .check-title {
+            text-align: center;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.5px;
+        }
+
+        .check-form {
+            display: flex;
+            gap: 1rem;
+            max-width: 500px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+        }
+
+        .check-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 1rem 1.5rem;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 0.875rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .check-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .check-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .check-result {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            border-radius: 16px;
+            font-size: 1rem;
+            font-weight: 600;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .check-result.success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #10b981;
+        }
+
+        .check-result.warning {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+
+        .check-result.info {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: var(--primary);
+        }
+
+        .check-result-text {
+            font-size: 2rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+        }
+
+        .onboarding-link {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.75rem 2rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .onboarding-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+
         @media (max-width: 768px) {
             .countdown-grid {
                 grid-template-columns: repeat(2, 1fr);
@@ -583,6 +686,14 @@
 
             .countdown-label {
                 font-size: 0.65rem;
+            }
+
+            .check-form {
+                flex-direction: column;
+            }
+
+            .check-input {
+                min-width: 100%;
             }
         }
     </style>
@@ -678,7 +789,7 @@
                     oficialesStudents = data.oficiales || 0;
                     const count = totalStudents - oficialesStudents;
                     
-                    const percentage = totalStudents > 0 ? Math.round((count / totalStudents) * 100) : 0;
+                    const percentage = totalStudents > 0 ? Math.round(100 - ((count / totalStudents) * 100)) : 0;
                     
                     content.innerHTML = `
                         <div class="stats-grid">
@@ -725,6 +836,27 @@
                             <span>•</span>
                             <span>${percentage}% del total</span>
                         </div>
+
+                        <div class="divider"></div>
+
+                        <div class="check-section">
+                            <div class="check-title">¿Voy a ser expulsado?</div>
+                            <div class="check-form">
+                                <input 
+                                    type="email" 
+                                    id="emailInput" 
+                                    class="check-input" 
+                                    placeholder="Ingresa tu correo electrónico"
+                                    autocomplete="email"
+                                >
+                                <button class="btn btn-primary" onclick="checkStatus()">
+                                    <span>Revisar</span>
+                                </button>
+                            </div>
+                            <div id="checkResult"></div>
+                        </div>
+
+                        <div class="divider"></div>
 
                         <div class="countdown-section">
                             <div id="countdown-container"></div>
@@ -775,6 +907,124 @@
         createParticles();
         loadCount();
         setInterval(loadCount, 5000);
+
+        function launchConfetti() {
+            const duration = 3000;
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 10000 };
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            const interval = setInterval(function() {
+                const timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+
+                const particleCount = 50 * (timeLeft / duration);
+
+                confetti(Object.assign({}, defaults, {
+                    particleCount,
+                    origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
+                }));
+                confetti(Object.assign({}, defaults, {
+                    particleCount,
+                    origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
+                }));
+            }, 250);
+        }
+
+        async function checkStatus() {
+            const emailInput = document.getElementById('emailInput');
+            const email = emailInput.value.trim();
+            const resultDiv = document.getElementById('checkResult');
+
+            if (!email) {
+                resultDiv.innerHTML = `
+                    <div class="check-result info">
+                        Por favor ingresa tu correo electrónico
+                    </div>
+                `;
+                return;
+            }
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                resultDiv.innerHTML = `
+                    <div class="check-result info">
+                        Por favor ingresa un correo electrónico válido
+                    </div>
+                `;
+                return;
+            }
+
+            resultDiv.innerHTML = `
+                <div class="check-result info">
+                    <div class="spinner" style="margin: 0 auto;"></div>
+                    Verificando...
+                </div>
+            `;
+
+            try {
+                const response = await fetch('/api/check-status', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email })
+                });
+
+                const data = await response.json();
+
+                if (!data.found) {
+                    resultDiv.innerHTML = `
+                        <div class="check-result info">
+                            <div class="check-result-text">❌</div>
+                            ${data.message}
+                        </div>
+                    `;
+                    return;
+                }
+
+                if (data.willBeExpelled) {
+                    resultDiv.innerHTML = `
+                        <div class="check-result warning">
+                            <div class="check-result-text">SI</div>
+                            Serás expulsado si no completas el onboarding
+                            <br>
+                            <a href="http://onboarding.nosoyliquidez.com" class="onboarding-link" target="_blank">
+                                Hacer Onboarding
+                            </a>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="check-result success">
+                            <div class="check-result-text">NO</div>
+                            ¡Felicidades! No serás expulsado 🎉
+                        </div>
+                    `;
+                    launchConfetti();
+                }
+
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="check-result info">
+                        Error al verificar el estado. Por favor intenta nuevamente.
+                    </div>
+                `;
+                console.error('Error:', error);
+            }
+        }
+
+        document.getElementById('emailInput')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkStatus();
+            }
+        });
     </script>
 </body>
 </html>

@@ -16,6 +16,7 @@
     <meta name="twitter:description" content="Estudiantes a ser expulsados">
     <meta name="twitter:image" content="https://i.imgur.com/placeholder.jpg">
     
+    <link rel="icon" type="image/png" href="favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -265,18 +266,16 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
             text-shadow: 0 0 40px rgba(99, 102, 241, 0.5);
-            animation: countAnimation 0.6s ease-out;
+            animation: countAnimation 1.5s ease-out;
             font-variant-numeric: tabular-nums;
         }
 
         @keyframes countAnimation {
             from {
-                opacity: 0;
-                transform: scale(0.8);
+                opacity: 0.7;
             }
             to {
                 opacity: 1;
-                transform: scale(1);
             }
         }
 
@@ -635,22 +634,10 @@
             const now = new Date();
             const difference = targetDate - now;
 
-            if (difference <= 0) {
-                document.getElementById('countdown-container').innerHTML = `
-                    <div class="countdown-title">
-                         LIMPIEZA COMPLETADA 
-                    </div>
-                `;
-                if (countdownInterval) {
-                    clearInterval(countdownInterval);
-                }
-                return;
-            }
-
-            const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+            const days = Math.max(0, Math.floor(difference / (1000 * 60 * 60 * 24)));
+            const hours = Math.max(0, Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)));
+            const minutes = Math.max(0, Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)));
+            const seconds = Math.max(0, Math.floor((difference % (1000 * 60)) / 1000));
 
             const countdownHTML = `
                 <div class="countdown-title">
@@ -755,9 +742,11 @@
                     if (previousCount !== null && previousCount !== count) {
                         const counterEl = document.getElementById('counterValue');
                         counterEl.style.animation = 'none';
+                        counterEl.style.opacity = '0.7';
                         setTimeout(() => {
-                            counterEl.style.animation = 'countAnimation 0.6s ease-out';
-                        }, 10);
+                            counterEl.style.animation = 'countAnimation 1.5s ease-out';
+                            counterEl.style.opacity = '1';
+                        }, 50);
                     }
                     
                     previousCount = count;

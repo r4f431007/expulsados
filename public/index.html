@@ -3,8 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estudiantes a Expulsar</title>
+    <title>NSL - Real time tracker</title>
+    
+    <meta name="description" content="Estudiantes a ser expulsados">
+    <meta property="og:title" content="NSL - Real time tracker">
+    <meta property="og:description" content="Estudiantes a ser expulsados">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://i.imgur.com/placeholder.jpg">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="NSL - Real time tracker">
+    <meta name="twitter:description" content="Estudiantes a ser expulsados">
+    <meta name="twitter:image" content="https://i.imgur.com/placeholder.jpg">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
     <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --accent: #ec4899;
+            --dark: #0f172a;
+            --dark-light: #1e293b;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,139 +39,757 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--dark);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
+            color: var(--text);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .bg-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(236, 72, 153, 0.1) 0%, transparent 50%);
+            z-index: 0;
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 50%;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0.3;
+            }
+            50% {
+                transform: translate(100px, -100px) scale(1.2);
+                opacity: 0.1;
+            }
         }
 
         .container {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .header {
             text-align: center;
-            padding: 3rem;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 30px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            max-width: 600px;
-            width: 90%;
+            margin-bottom: 3rem;
+            animation: fadeInDown 0.8s ease-out;
         }
 
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 2rem;
-            font-weight: 700;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .counter {
-            font-size: 8rem;
+        .logo {
+            font-size: 2rem;
             font-weight: 900;
-            margin: 2rem 0;
-            text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.4);
-            line-height: 1;
-            animation: pulse 2s ease-in-out infinite;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: 600;
+        }
+
+        .dashboard {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 32px;
+            padding: 3rem;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dashboard::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+            opacity: 0.8;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 1.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(99, 102, 241, 0.3);
+            box-shadow: 0 12px 24px rgba(99, 102, 241, 0.15);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, var(--text-muted));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .main-counter {
+            text-align: center;
+            margin: 3rem 0;
+            position: relative;
+        }
+
+        .counter-label {
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .counter-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .counter-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, transparent 70%);
+            filter: blur(40px);
+            animation: pulse 3s ease-in-out infinite;
+            pointer-events: none;
         }
 
         @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+            0%, 100% {
+                opacity: 0.5;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                opacity: 0.8;
+                transform: translate(-50%, -50%) scale(1.1);
+            }
         }
 
-        .label {
-            font-size: 1.5rem;
-            opacity: 0.9;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+        .counter {
+            position: relative;
+            font-size: 9rem;
+            font-weight: 900;
+            line-height: 1;
+            background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 40px rgba(99, 102, 241, 0.5);
+            animation: countAnimation 0.6s ease-out;
+            font-variant-numeric: tabular-nums;
+        }
+
+        @keyframes countAnimation {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .counter-suffix {
+            font-size: 1.25rem;
+            color: var(--text-muted);
             font-weight: 600;
+            margin-top: 0.5rem;
         }
 
-        .loading {
-            font-size: 1.2rem;
-            opacity: 0.7;
-        }
-
-        .error {
-            color: #ff6b6b;
-            font-size: 1.2rem;
-            padding: 1rem;
-            background: rgba(255, 107, 107, 0.2);
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 10px;
-            margin-top: 1rem;
+            overflow: hidden;
+            margin: 2rem 0;
         }
 
-        .last-update {
-            margin-top: 2rem;
-            font-size: 0.9rem;
-            opacity: 0.7;
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+            border-radius: 10px;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
         }
 
-        .refresh-btn {
-            margin-top: 2rem;
+        .actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
             padding: 1rem 2rem;
-            font-size: 1rem;
-            background: rgba(255, 255, 255, 0.2);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.875rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            font-family: inherit;
         }
 
-        .refresh-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
         }
 
-        .refresh-btn:active {
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn:active {
             transform: translateY(0);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .meta-info {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+            animation: blink 2s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .loading {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                padding: 2rem 1.5rem;
+            }
+
+            .counter {
+                font-size: 6rem;
+            }
+
+            .logo {
+                font-size: 1.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.5rem 1rem;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            margin-bottom: 0.5rem;
+        }
+
+        .tooltip:hover::after {
+            opacity: 1;
+        }
+
+        .countdown-section {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .countdown-title {
+            text-align: center;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .countdown-title::before,
+        .countdown-title::after {
+            content: '';
+            width: 40px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+        }
+
+        .countdown-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .countdown-item {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(236, 72, 153, 0.2);
+            border-radius: 16px;
+            padding: 1.25rem 0.75rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .countdown-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent), var(--secondary));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .countdown-item:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+            box-shadow: 0 8px 20px rgba(236, 72, 153, 0.25);
+        }
+
+        .countdown-item:hover::before {
+            opacity: 1;
+        }
+
+        .countdown-number {
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .countdown-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .countdown-warning {
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .countdown-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+            }
+
+            .countdown-number {
+                font-size: 2rem;
+            }
+
+            .countdown-label {
+                font-size: 0.65rem;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="bg-gradient"></div>
+    <div class="particles" id="particles"></div>
+
     <div class="container">
-        <h1>Estudiantes a Expulsar</h1>
-        <div id="content">
-            <div class="loading">Cargando...</div>
+        <div class="header">
+            <div class="logo">NSL TRACKER</div>
         </div>
-        <button class="refresh-btn" onclick="loadCount()">Actualizar</button>
-        <div class="last-update" id="lastUpdate"></div>
+
+        <div class="dashboard">
+            <div id="content">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <div>Conectando con Discord...</div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
+        let previousCount = null;
+        let totalStudents = 0;
+        let activeStudents = 0;
+        let countdownInterval = null;
+
+        const targetDate = new Date('2024-12-01T23:59:59-05:00');
+
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                const size = Math.random() * 100 + 50;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 15) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        function updateCountdown() {
+            const now = new Date();
+            const difference = targetDate - now;
+
+            if (difference <= 0) {
+                document.getElementById('countdown-container').innerHTML = `
+                    <div class="countdown-title">
+                         LIMPIEZA COMPLETADA 
+                    </div>
+                `;
+                if (countdownInterval) {
+                    clearInterval(countdownInterval);
+                }
+                return;
+            }
+
+            const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+            const countdownHTML = `
+                <div class="countdown-title">
+                     LIMPIEZA EN 
+                </div>
+                <div class="countdown-grid">
+                    <div class="countdown-item">
+                        <div class="countdown-number">${days}</div>
+                        <div class="countdown-label">Días</div>
+                    </div>
+                    <div class="countdown-item">
+                        <div class="countdown-number">${String(hours).padStart(2, '0')}</div>
+                        <div class="countdown-label">Horas</div>
+                    </div>
+                    <div class="countdown-item">
+                        <div class="countdown-number">${String(minutes).padStart(2, '0')}</div>
+                        <div class="countdown-label">Minutos</div>
+                    </div>
+                    <div class="countdown-item">
+                        <div class="countdown-number">${String(seconds).padStart(2, '0')}</div>
+                        <div class="countdown-label">Segundos</div>
+                    </div>
+                </div>
+                <div class="countdown-warning">
+                    1 de Diciembre, 2024 - 11:59 PM (EST)
+                </div>
+            `;
+
+            document.getElementById('countdown-container').innerHTML = countdownHTML;
+        }
+
         async function loadCount() {
             const content = document.getElementById('content');
-            const lastUpdateEl = document.getElementById('lastUpdate');
             
             try {
-                content.innerHTML = '<div class="loading">Cargando...</div>';
-                
                 const response = await fetch('/api/count');
                 const data = await response.json();
                 
                 if (response.ok) {
-                    content.innerHTML = `
-                        <div class="counter">${data.expulsados}</div>
-                        <div class="label">Estudiantes</div>
-                    `;
+                    const count = data.expulsados;
+                    totalStudents = data.total || count + 100;
+                    activeStudents = data.activos || 100;
                     
-                    const updateTime = new Date(data.timestamp).toLocaleString('es-ES');
-                    lastUpdateEl.textContent = `Última actualización: ${updateTime}`;
+                    const percentage = Math.round((count / totalStudents) * 100);
+                    
+                    content.innerHTML = `
+                        <div class="stats-grid">
+                            <div class="stat-card tooltip" data-tooltip="Total de estudiantes registrados">
+                                <div class="stat-label">Total Estudiantes</div>
+                                <div class="stat-value">${totalStudents}</div>
+                            </div>
+                            <div class="stat-card tooltip" data-tooltip="Estudiantes activos actualmente">
+                                <div class="stat-label">Activos</div>
+                                <div class="stat-value">${activeStudents}</div>
+                            </div>
+                        </div>
+
+                        <div class="main-counter">
+                            <div class="counter-label">Estudiantes a Expulsar</div>
+                            <div class="counter-wrapper">
+                                <div class="counter-glow"></div>
+                                <div class="counter" id="counterValue">${count}</div>
+                            </div>
+                            <div class="counter-suffix">PENDIENTES DE REVISIÓN</div>
+                        </div>
+
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${percentage}%"></div>
+                        </div>
+
+                        <div class="actions">
+                            <button class="btn btn-primary" onclick="loadCount()">
+                                <span>Actualizar</span>
+                            </button>
+                            <button class="btn btn-secondary" onclick="window.location.reload()">
+                                <span>↻ Recargar Todo</span>
+                            </button>
+                        </div>
+
+                        <div class="meta-info">
+                            <div class="status-indicator">
+                                <div class="status-dot"></div>
+                                <span>Sistema Activo</span>
+                            </div>
+                            <span>•</span>
+                            <span>Última actualización: ${new Date(data.timestamp).toLocaleString('es-ES', {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                second: '2-digit'
+                            })}</span>
+                            <span>•</span>
+                            <span>${percentage}% del total</span>
+                        </div>
+
+                        <div class="countdown-section">
+                            <div id="countdown-container"></div>
+                        </div>
+                    `;
+
+                    updateCountdown();
+                    if (!countdownInterval) {
+                        countdownInterval = setInterval(updateCountdown, 1000);
+                    }
+
+                    if (previousCount !== null && previousCount !== count) {
+                        const counterEl = document.getElementById('counterValue');
+                        counterEl.style.animation = 'none';
+                        setTimeout(() => {
+                            counterEl.style.animation = 'countAnimation 0.6s ease-out';
+                        }, 10);
+                    }
+                    
+                    previousCount = count;
                 } else {
-                    content.innerHTML = `<div class="error">Error: ${data.error}</div>`;
+                    content.innerHTML = `
+                        <div class="error">
+                            <h3 style="margin-bottom: 0.5rem;">Error de Conexión</h3>
+                            <p>${data.error || 'No se pudo conectar con el servidor'}</p>
+                            <button class="btn btn-primary" onclick="loadCount()" style="margin-top: 1rem;">
+                                Reintentar
+                            </button>
+                        </div>
+                    `;
                 }
             } catch (error) {
-                content.innerHTML = `<div class="error">Error de conexión</div>`;
+                content.innerHTML = `
+                    <div class="error">
+                        <h3 style="margin-bottom: 0.5rem;">Error de Red</h3>
+                        <p>No se pudo establecer conexión con el servidor</p>
+                        <button class="btn btn-primary" onclick="loadCount()" style="margin-top: 1rem;">
+                            Reintentar
+                        </button>
+                    </div>
+                `;
                 console.error('Error:', error);
             }
         }
 
+        createParticles();
         loadCount();
         setInterval(loadCount, 60000);
     </script>

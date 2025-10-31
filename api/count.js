@@ -9,7 +9,7 @@ const client = new Client({
 
 let cachedCount = null;
 let lastUpdate = null;
-const CACHE_DURATION = 3600000;
+const CACHE_DURATION = 900000;
 let isClientReady = false;
 let loginPromise = null;
 

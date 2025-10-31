@@ -791,91 +791,114 @@
                     
                     const percentage = totalStudents > 0 ? Math.round(100 - ((count / totalStudents) * 100)) : 0;
                     
-                    content.innerHTML = `
-                        <div class="stats-grid">
-                            <div class="stat-card tooltip" data-tooltip="Total de estudiantes registrados">
-                                <div class="stat-label">Total Estudiantes</div>
-                                <div class="stat-value">${totalStudents}</div>
+                    const isFirstLoad = document.getElementById('staticContent') === null;
+                    
+                    if (isFirstLoad) {
+                        content.innerHTML = `
+                            <div id="staticContent">
+                                <div class="stats-grid">
+                                    <div class="stat-card tooltip" data-tooltip="Total de estudiantes registrados">
+                                        <div class="stat-label">Total Estudiantes</div>
+                                        <div class="stat-value" id="totalValue">${totalStudents}</div>
+                                    </div>
+                                    <div class="stat-card tooltip" data-tooltip="Estudiantes oficiales">
+                                        <div class="stat-label">Estudiantes Oficiales</div>
+                                        <div class="stat-value" id="oficialesValue">${oficialesStudents}</div>
+                                    </div>
+                                </div>
+
+                                <div class="main-counter">
+                                    <div class="counter-label">Estudiantes a Expulsar</div>
+                                    <div class="counter-wrapper">
+                                        <div class="counter-glow"></div>
+                                        <div class="counter" id="counterValue">${count}</div>
+                                    </div>
+                                    <div class="counter-suffix">PENDIENTES DE REVISIÓN</div>
+                                </div>
+
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="progressFill" style="width: ${percentage}%"></div>
+                                </div>
+
+                                <div class="actions">
+                                    <button class="btn btn-primary" onclick="loadCount()">
+                                        <span>Actualizar</span>
+                                    </button>
+                                </div>
+
+                                <div class="meta-info">
+                                    <div class="status-indicator">
+                                        <div class="status-dot"></div>
+                                        <span>Sistema Activo</span>
+                                    </div>
+                                    <span>•</span>
+                                    <span id="lastUpdate">Última actualización: ${new Date(data.timestamp).toLocaleString('es-ES', {
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                        second: '2-digit'
+                                    })}</span>
+                                    <span>•</span>
+                                    <span id="percentageText">${percentage}% del total</span>
+                                </div>
+
+                                <div class="divider"></div>
+
+                                <div class="check-section">
+                                    <div class="check-title">¿Voy a ser expulsado?</div>
+                                    <div class="check-form">
+                                        <input 
+                                            type="email" 
+                                            id="emailInput" 
+                                            class="check-input" 
+                                            placeholder="Ingresa tu correo electrónico"
+                                            autocomplete="email"
+                                        >
+                                        <button class="btn btn-primary" onclick="checkStatus()">
+                                            <span>Revisar</span>
+                                        </button>
+                                    </div>
+                                    <div id="checkResult"></div>
+                                </div>
+
+                                <div class="divider"></div>
+
+                                <div class="countdown-section">
+                                    <div id="countdown-container"></div>
+                                </div>
                             </div>
-                            <div class="stat-card tooltip" data-tooltip="Estudiantes oficiales">
-                                <div class="stat-label">Estudiantes Oficiales</div>
-                                <div class="stat-value">${oficialesStudents}</div>
-                            </div>
-                        </div>
+                        `;
 
-                        <div class="main-counter">
-                            <div class="counter-label">Estudiantes a Expulsar</div>
-                            <div class="counter-wrapper">
-                                <div class="counter-glow"></div>
-                                <div class="counter" id="counterValue">${count}</div>
-                            </div>
-                            <div class="counter-suffix">PENDIENTES DE REVISIÓN</div>
-                        </div>
+                        updateCountdown();
+                        if (!countdownInterval) {
+                            countdownInterval = setInterval(updateCountdown, 1000);
+                        }
 
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: ${percentage}%"></div>
-                        </div>
+                        document.getElementById('emailInput')?.addEventListener('keypress', function(e) {
+                            if (e.key === 'Enter') {
+                                checkStatus();
+                            }
+                        });
+                    } else {
+                        document.getElementById('totalValue').textContent = totalStudents;
+                        document.getElementById('oficialesValue').textContent = oficialesStudents;
+                        document.getElementById('counterValue').textContent = count;
+                        document.getElementById('progressFill').style.width = percentage + '%';
+                        document.getElementById('lastUpdate').textContent = `Última actualización: ${new Date(data.timestamp).toLocaleString('es-ES', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit'
+                        })}`;
+                        document.getElementById('percentageText').textContent = `${percentage}% del total`;
 
-                        <div class="actions">
-                            <button class="btn btn-primary" onclick="loadCount()">
-                                <span>Actualizar</span>
-                            </button>
-                        </div>
-
-                        <div class="meta-info">
-                            <div class="status-indicator">
-                                <div class="status-dot"></div>
-                                <span>Sistema Activo</span>
-                            </div>
-                            <span>•</span>
-                            <span>Última actualización: ${new Date(data.timestamp).toLocaleString('es-ES', {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                second: '2-digit'
-                            })}</span>
-                            <span>•</span>
-                            <span>${percentage}% del total</span>
-                        </div>
-
-                        <div class="divider"></div>
-
-                        <div class="check-section">
-                            <div class="check-title">¿Voy a ser expulsado?</div>
-                            <div class="check-form">
-                                <input 
-                                    type="email" 
-                                    id="emailInput" 
-                                    class="check-input" 
-                                    placeholder="Ingresa tu correo electrónico"
-                                    autocomplete="email"
-                                >
-                                <button class="btn btn-primary" onclick="checkStatus()">
-                                    <span>Revisar</span>
-                                </button>
-                            </div>
-                            <div id="checkResult"></div>
-                        </div>
-
-                        <div class="divider"></div>
-
-                        <div class="countdown-section">
-                            <div id="countdown-container"></div>
-                        </div>
-                    `;
-
-                    updateCountdown();
-                    if (!countdownInterval) {
-                        countdownInterval = setInterval(updateCountdown, 1000);
-                    }
-
-                    if (previousCount !== null && previousCount !== count) {
-                        const counterEl = document.getElementById('counterValue');
-                        counterEl.style.animation = 'none';
-                        counterEl.style.opacity = '0.7';
-                        setTimeout(() => {
-                            counterEl.style.animation = 'countAnimation 1.5s ease-out';
-                            counterEl.style.opacity = '1';
-                        }, 50);
+                        if (previousCount !== null && previousCount !== count) {
+                            const counterEl = document.getElementById('counterValue');
+                            counterEl.style.animation = 'none';
+                            counterEl.style.opacity = '0.7';
+                            setTimeout(() => {
+                                counterEl.style.animation = 'countAnimation 1.5s ease-out';
+                                counterEl.style.opacity = '1';
+                            }, 50);
+                        }
                     }
                     
                     previousCount = count;
@@ -1019,12 +1042,6 @@
                 console.error('Error:', error);
             }
         }
-
-        document.getElementById('emailInput')?.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                checkStatus();
-            }
-        });
     </script>
 </body>
 </html>

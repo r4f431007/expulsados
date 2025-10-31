@@ -906,7 +906,7 @@
                             <h3 style="margin-bottom: 0.5rem;">Error de Conexión</h3>
                             <p>${data.error || 'No se pudo conectar con el servidor'}</p>
                             <button class="btn btn-primary" onclick="loadCount()" style="margin-top: 1rem;">
-                                Reintentar
+                                Actualizar
                             </button>
                         </div>
                     `;
@@ -917,7 +917,7 @@
                         <h3 style="margin-bottom: 0.5rem;">Error de Red</h3>
                         <p>No se pudo establecer conexión con el servidor</p>
                         <button class="btn btn-primary" onclick="loadCount()" style="margin-top: 1rem;">
-                            Reintentar
+                            Actualizar
                         </button>
                     </div>
                 `;
@@ -927,7 +927,6 @@
 
         createParticles();
         loadCount();
-        setInterval(loadCount, 5000);
 
         function launchConfetti() {
             const duration = 3000;

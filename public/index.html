@@ -1003,7 +1003,17 @@
                 if (!data.found) {
                     resultDiv.innerHTML = `
                         <div class="check-result info">
-                            <div class="check-result-text">❌</div>
+                            <div class="check-result-text"></div>
+                            ${data.message}
+                        </div>
+                    `;
+                    return;
+                }
+
+                if (!data.isOfficial) {
+                    resultDiv.innerHTML = `
+                        <div class="check-result warning">
+                            <div class="check-result-text"></div>
                             ${data.message}
                         </div>
                     `;
@@ -1025,7 +1035,7 @@
                     resultDiv.innerHTML = `
                         <div class="check-result success">
                             <div class="check-result-text">NO</div>
-                            ¡Felicidades! No serás expulsado 🎉
+                            ¡Felicidades! No serás expulsado
                         </div>
                     `;
                     launchConfetti();

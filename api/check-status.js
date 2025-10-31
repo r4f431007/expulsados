@@ -55,7 +55,7 @@ export default async function handler(req, res) {
     connection = await poolConnection.getConnection();
     
     const [rows] = await connection.execute(
-      'SELECT discord_role FROM students_score WHERE email = ?',
+      'SELECT discord_role, score FROM students_score WHERE email = ?',
       [cleanEmail]
     );
 
@@ -64,15 +64,26 @@ export default async function handler(req, res) {
     if (rows.length === 0) {
       return res.status(200).json({ 
         found: false,
-        message: 'Estudiante no encontrado' 
+        message: 'Email no existe' 
       });
     }
 
     const discordRole = rows[0].discord_role;
+    const score = rows[0].score || 0;
+
+    if (score < 12) {
+      return res.status(200).json({
+        found: true,
+        isOfficial: false,
+        message: 'No eres estudiante oficial de NSL'
+      });
+    }
+
     const willBeExpelled = discordRole === 'NO';
 
     return res.status(200).json({
       found: true,
+      isOfficial: true,
       willBeExpelled: willBeExpelled,
       message: willBeExpelled ? 'SI' : 'NO'
     });

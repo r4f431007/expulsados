@@ -9,7 +9,7 @@ const client = new Client({
 
 let cachedCount = null;
 let lastUpdate = null;
-const CACHE_DURATION = 60000;
+const CACHE_DURATION = 3600000;
 let isClientReady = false;
 let loginPromise = null;
 
@@ -89,6 +89,15 @@ export default async function handler(req, res) {
     });
   } catch (error) {
     console.error('Error:', error);
+    
+    if (error.message && error.message.includes('sessions remaining')) {
+      return res.status(503).json({ 
+        error: 'Límite de Discord alcanzado',
+        message: 'Se han agotado las conexiones disponibles. Los datos se actualizarán automáticamente cuando Discord lo permita.',
+        cachedData: cachedCount
+      });
+    }
+    
     res.status(500).json({ 
       error: 'Error al obtener datos',
       message: error.message 

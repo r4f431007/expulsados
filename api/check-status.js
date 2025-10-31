@@ -1,24 +1,24 @@
 import mysql from 'mysql2/promise';
 
-let connection = null;
+let pool = null;
 
-async function getConnection() {
-  if (!connection) {
-    try {
-      connection = await mysql.createConnection({
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        database: process.env.DB_NAME,
-        port: parseInt(process.env.DB_PORT) || 3306
-      });
-      console.log('Database connection established');
-    } catch (error) {
-      console.error('Database connection error:', error);
-      throw error;
-    }
+function getPool() {
+  if (!pool) {
+    pool = mysql.createPool({
+      host: process.env.DB_HOST,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+      port: parseInt(process.env.DB_PORT) || 3306,
+      waitForConnections: true,
+      connectionLimit: 10,
+      queueLimit: 0,
+      enableKeepAlive: true,
+      keepAliveInitialDelay: 0
+    });
+    console.log('Database pool created');
   }
-  return connection;
+  return pool;
 }
 
 export default async function handler(req, res) {
@@ -33,6 +33,8 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
+
+  let connection = null;
 
   try {
     console.log('Request body:', req.body);
@@ -49,9 +51,10 @@ export default async function handler(req, res) {
     const cleanEmail = email.toLowerCase().trim();
     console.log('Searching for email:', cleanEmail);
 
-    const conn = await getConnection();
+    const poolConnection = getPool();
+    connection = await poolConnection.getConnection();
     
-    const [rows] = await conn.execute(
+    const [rows] = await connection.execute(
       'SELECT discord_role FROM students_score WHERE email = ?',
       [cleanEmail]
     );
@@ -81,5 +84,9 @@ export default async function handler(req, res) {
       message: error.message,
       found: false
     });
+  } finally {
+    if (connection) {
+      connection.release();
+    }
   }
 }

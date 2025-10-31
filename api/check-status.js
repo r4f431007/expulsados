@@ -69,9 +69,22 @@ export default async function handler(req, res) {
     }
 
     const discordRole = rows[0].discord_role;
-    const score = rows[0].score || 0;
+    const scoreString = rows[0].score || '0';
+    
+    let score = 0;
+    if (typeof scoreString === 'string' && scoreString.includes('/')) {
+      score = parseInt(scoreString.split('/')[0]);
+    } else {
+      score = parseInt(scoreString) || 0;
+    }
+
+    console.log('Score string:', scoreString);
+    console.log('Parsed score:', score);
+    console.log('Discord Role:', discordRole);
+    console.log('Score < 12?', score < 12);
 
     if (score < 12) {
+      console.log('Returning: Not official student');
       return res.status(200).json({
         found: true,
         isOfficial: false,
@@ -80,6 +93,7 @@ export default async function handler(req, res) {
     }
 
     const willBeExpelled = discordRole === 'NO';
+    console.log('Will be expelled:', willBeExpelled);
 
     return res.status(200).json({
       found: true,
